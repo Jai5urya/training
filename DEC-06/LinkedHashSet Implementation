@@ -1,0 +1,110 @@
+public class LinkedHashSet<K> {
+	private class Node {
+		int hash;
+		K key;
+		Node next;
+		Node prev;
+		Node after;
+
+		public Node(int hashValue, K key) {
+			this.hash = hashValue;
+			this.key = key;
+		}
+	}
+
+	private Object[] array;
+	
+	private static int INITIAL_CAPACITY = 5;
+	private static float LOAD_FACTOR = .75f;
+	private static int RESIZE_FACTOR = 2;
+
+	public LinkedHashSet() {
+		array = new Object[INITIAL_CAPACITY];
+	}
+
+	private int size = 0;
+	Node head;
+	Node tail;
+
+	public boolean add(K key) {
+		if (contains(key))
+			return false;
+		reHashing();
+		size++;
+		int hash = key.hashCode();
+		int index = getIndex(hash);
+		Node newNode = new Node(hash, key);
+		if (head == null) {
+			head = tail = newNode;
+			array[index] = head;
+			return true;
+		}
+
+		Node temp = (Node) array[index];
+
+		if (temp == null) {
+			array[index] = newNode;
+			newNode.prev = tail;
+			tail.next = newNode;
+			tail=newNode;
+			return true;
+		}
+
+		while (temp.after != null) {
+			temp = temp.after;
+		}
+		temp.after = newNode;
+		newNode.prev = tail;
+		tail.next = newNode;
+		tail=newNode;
+		return true;
+	}
+
+	private void reHashing() {
+		int length = array.length;
+		if(size<length* LOAD_FACTOR) return;
+		Node tempHead = head;
+		size=0;
+		array = new Object[length*2];
+		head=null;
+		tail=null;
+		while(tempHead != null) {
+			add(tempHead.key);
+			tempHead = tempHead.next;
+		}
+		
+	}
+
+	private boolean contains(K key) {
+		int index = getIndex(key.hashCode());
+		Node current = (Node) array[index];
+		if (current == null)
+			return false;
+		while (current != null) {
+			if (current.key.equals(key))
+				return true;
+			current = current.after;
+		}
+		return false;
+	}
+
+	private int getIndex(int hash) {
+		return hash & (array.length - 1);
+	}
+	
+	public int size() {
+		return size;
+	}
+	
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder("[ ");
+		Node currentNode = head;
+		while(currentNode != null) {
+			stringBuilder.append(currentNode.key+" ");
+			currentNode=currentNode.next;
+		}
+		
+		return stringBuilder.toString()+"]";
+	}
+
+}
