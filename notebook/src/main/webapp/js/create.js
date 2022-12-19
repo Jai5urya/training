@@ -15,7 +15,7 @@ $(document).ready(function(){
 				note: note,
 				tag: tag,
 			}),
-			datatype : "json",
+			datatype : 'json',
 			success: function(responseString) {
 				alert(responseString);
 				responseString = JSON.parse(responseString); 
@@ -25,6 +25,9 @@ $(document).ready(function(){
 			} else {
 				$("#displayMessage").show();
 			}
+		  },
+		 error:function(responseString){
+			 alert(responseString);
 		  }
 		 });
 	 });
